@@ -6,14 +6,15 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
 public abstract class Grafo {
-    protected List<Nodo> nodos;
-    protected List<Arco> arcos;
+    protected List<Nodo> nodos = new ArrayList<>();
+    protected List<Arco> arcos = new ArrayList<>();
 
 
     public void addNodo(String nombre) {
