@@ -4,9 +4,8 @@ import com.uniandes.grafos.grafos.nodo.Nodo;
 import com.uniandes.grafos.grafos.nodo.NodoBase;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
+import java.util.Stack;
 
 public abstract class GrafoDFS extends Grafo {
 
@@ -31,51 +30,52 @@ public abstract class GrafoDFS extends Grafo {
             throw new RuntimeException("Error en la B�squeda: NodoOrigen no encontrado");
         }
 
-        if (buscarRutaBFS(nodosRuta, nodoOrigen, nodoDestino)) {
+        if (buscarRutaDFS(nodosRuta, nodoOrigen, nodoDestino)) {
             return nodosRuta;
         } else {
             return null;
         }
     }
 
-    private boolean buscarRutaBFS(List<Nodo> nodosRuta, Nodo nodoOrigen, Nodo nodoDestino) {
+    private boolean buscarRutaDFS(List<Nodo> nodosRuta, Nodo nodoOrigen, Nodo nodoDestino) {
+
+        // agrega el origen
+        nodosRuta.add(nodoOrigen);
 
         // origen y destino son el mismo ?
         if (nodoOrigen.getNombre().equals(nodoDestino.getNombre())) {
-            System.err.println("Nodo destino encontrado en el mismo nodo origen");
-            nodosRuta.add(nodoOrigen);
             return true;
         }
 
-        // si no son el mismo, revise las rutas usando una cola
-        Queue<Nodo> queue = new LinkedList<>();
+        // si no son el mismo, revise las rutas usando una pila
+        Stack<Nodo> pilaDeNodos = new Stack<>();
         ArrayList<Nodo> nodosVisitados = new ArrayList<>();
 
-        queue.add(nodoOrigen);
-        nodosVisitados.add(nodoOrigen);
+        pilaDeNodos.add(nodoOrigen);
 
-        while (!queue.isEmpty()) {
+        while (!pilaDeNodos.isEmpty()) {
+            Nodo actual = pilaDeNodos.pop();
 
-            Nodo actual = queue.remove();
+            // ignore los nodos ya visitados
+            if (nodosVisitados.contains(actual))
+                continue;
+
+            // es el nodo que estamos buscando ?
             if (actual.equals(nodoDestino)) {
-                nodosRuta.add(actual);
+                nodosRuta.addAll(pilaDeNodos);
+                nodosRuta.add(nodoDestino);
                 return true;
             } else {
-                if (actual.getNodosAdyacentes().isEmpty())
-                    return false;
-                else {
-                    for (NodoBase nodo : actual.getNodosAdyacentes()) {
-                        if (!nodosVisitados.contains(nodo))
-                            queue.add((Nodo) nodo);
-                    }
+                // siga buscando en las rutas no visitadas
+                nodosVisitados.add(actual);
+                for (NodoBase nodo : actual.getNodosAdyacentes()) {
+                    if (!pilaDeNodos.contains(nodo))
+                        pilaDeNodos.add((Nodo) nodo);
                 }
-
             }
-            if (!nodosRuta.contains(actual))
-                nodosRuta.add(actual);
         }
-
         return false;
+
     }
 
 }
